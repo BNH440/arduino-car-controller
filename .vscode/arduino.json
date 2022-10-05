@@ -1,0 +1,6 @@
+{
+    "sketch": "arduino-car/socket.ino",
+    "board": "arduino:megaavr:uno2018",
+    "configuration": "mode=off",
+    "port": "/dev/tty.usbmodem102"
+}
