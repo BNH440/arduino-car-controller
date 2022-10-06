@@ -88,7 +88,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     await device.connect();
                   } catch (e) {
                     if (e != 'already_connected') {
-                      throw e;
+                      await device.disconnect();
+                      await device.connect();
                     }
                   } finally {
                     _services = await device.discoverServices();
@@ -113,27 +114,89 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   ListView _buildConnectDeviceView() {
-    List<Container> containers = <Container>[
-      Container(
-        height: 50,
-        child: Row(
-          children: <Widget>[
-            MaterialButton(
-                color: Colors.blue,
-                child: Text(
-                  'Horn',
-                  style: TextStyle(color: Colors.white),
-                ),
-                onPressed: () {
-                  _services[2]
-                      .characteristics
-                      .firstWhere((element) =>
-                          element == "19B10013-E8F2-537E-4F6C-D104768A1214")
-                      .write([0x01]);
-                }),
-          ],
-        ),
+    List<Widget> containers = <Widget>[
+      ListView(
+        shrinkWrap: true,
+        children: [
+          MaterialButton(
+              color: Colors.blue,
+              child: const Text(
+                'Horn',
+                style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () {
+                _services[2].characteristics[2].write([0x00]);
+              }),
+          MaterialButton(
+              color: Colors.blue,
+              child: const Text(
+                'Light On',
+                style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () {
+                _services[2].characteristics[0].write([0x01]);
+              }),
+          MaterialButton(
+              color: Colors.blue,
+              child: const Text(
+                'Light Off',
+                style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () {
+                _services[2].characteristics[0].write([0x00]);
+              }),
+        ],
       ),
+      ListView(
+        shrinkWrap: true,
+        children: [
+          MaterialButton(
+              color: Colors.blue,
+              child: const Text(
+                'Stop',
+                style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () {
+                _services[2].characteristics[3].write([0x00]);
+              }),
+          MaterialButton(
+              color: Colors.blue,
+              child: const Text(
+                'Forward',
+                style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () {
+                _services[2].characteristics[3].write([0x01]);
+              }),
+          MaterialButton(
+              color: Colors.blue,
+              child: const Text(
+                'Backward',
+                style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () {
+                _services[2].characteristics[3].write([0x02]);
+              }),
+          MaterialButton(
+              color: Colors.blue,
+              child: const Text(
+                'Left',
+                style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () {
+                _services[2].characteristics[3].write([0x03]);
+              }),
+          MaterialButton(
+              color: Colors.blue,
+              child: const Text(
+                'Right',
+                style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () {
+                _services[2].characteristics[3].write([0x04]);
+              }),
+        ],
+      )
     ];
 
     // for (BluetoothService service in _services) {
