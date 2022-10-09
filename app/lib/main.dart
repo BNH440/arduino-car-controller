@@ -46,7 +46,7 @@ class MyHomePage extends StatefulWidget {
 
   final FlutterBluePlus flutterBlue = FlutterBluePlus.instance;
   final List<BluetoothDevice> devicesList = <BluetoothDevice>[];
-  final Map<Guid, List<int>> readValues = new Map<Guid, List<int>>();
+  final Map<Guid, List<int>> readValues = <Guid, List<int>>{};
 
   final String title;
 
@@ -56,8 +56,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   List<BluetoothService> _services = <BluetoothService>[];
-  BluetoothDevice? _connectedDevice = null;
-  final _writeController = TextEditingController();
+  BluetoothDevice? _connectedDevice;
 
   ListView _buildListViewOfDevices() {
     List<Container> containers = <Container>[];
@@ -77,7 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               MaterialButton(
                 color: Colors.blue,
-                child: Text(
+                child: const Text(
                   'Connect',
                   style: TextStyle(color: Colors.white),
                 ),
@@ -150,6 +149,51 @@ class _MyHomePageState extends State<MyHomePage> {
       ListView(
         shrinkWrap: true,
         children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              MaterialButton(
+                  color: Colors.blue,
+                  child: const Text(
+                    'Forward',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  onPressed: () {
+                    _services[2].characteristics[3].write([0x01]);
+                  }),
+            ],
+          ),
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            MaterialButton(
+                color: Colors.blue,
+                child: const Text(
+                  'Left',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onPressed: () {
+                  _services[2].characteristics[3].write([0x03]);
+                }),
+            MaterialButton(
+                color: Colors.blue,
+                child: const Text(
+                  'Right',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onPressed: () {
+                  _services[2].characteristics[3].write([0x04]);
+                }),
+          ]),
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            MaterialButton(
+                color: Colors.blue,
+                child: const Text(
+                  'Backward',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onPressed: () {
+                  _services[2].characteristics[3].write([0x02]);
+                }),
+          ]),
           MaterialButton(
               color: Colors.blue,
               child: const Text(
@@ -160,63 +204,38 @@ class _MyHomePageState extends State<MyHomePage> {
                 _services[2].characteristics[3].write([0x00]);
               }),
           MaterialButton(
-              color: Colors.blue,
-              child: const Text(
-                'Forward',
-                style: TextStyle(color: Colors.white),
-              ),
-              onPressed: () {
-                _services[2].characteristics[3].write([0x01]);
-              }),
+              onPressed: () async {
+                var sub = _services[2].characteristics[1].value.listen((value) {
+                  setState(() {
+                    widget.readValues[_services[2].characteristics[1].uuid] =
+                        value;
+                  });
+                });
+                await _services[2].characteristics[1].read();
+                sub.cancel();
+                log((await (_services[2].characteristics[1].read()))
+                    .toString());
+              },
+              child: Text(
+                  "Light Level: ${(widget.readValues[_services[2].characteristics[1].uuid])?[0]}")),
           MaterialButton(
-              color: Colors.blue,
-              child: const Text(
-                'Backward',
-                style: TextStyle(color: Colors.white),
-              ),
-              onPressed: () {
-                _services[2].characteristics[3].write([0x02]);
-              }),
-          MaterialButton(
-              color: Colors.blue,
-              child: const Text(
-                'Left',
-                style: TextStyle(color: Colors.white),
-              ),
-              onPressed: () {
-                _services[2].characteristics[3].write([0x03]);
-              }),
-          MaterialButton(
-              color: Colors.blue,
-              child: const Text(
-                'Right',
-                style: TextStyle(color: Colors.white),
-              ),
-              onPressed: () {
-                _services[2].characteristics[3].write([0x04]);
-              }),
+              onPressed: () async {
+                var sub = _services[2].characteristics[4].value.listen((value) {
+                  setState(() {
+                    widget.readValues[_services[2].characteristics[4].uuid] =
+                        value;
+                  });
+                });
+                await _services[2].characteristics[4].read();
+                sub.cancel();
+                log((await (_services[2].characteristics[4].read()))
+                    .toString());
+              },
+              child: Text(
+                  "Temp(F): ${(widget.readValues[_services[2].characteristics[4].uuid])?[0]}")),
         ],
       )
     ];
-
-    // for (BluetoothService service in _services) {
-    //   containers.add(
-    //     Container(
-    //       height: 50,
-    //       child: Row(
-    //         children: <Widget>[
-    //           Expanded(
-    //             child: Column(
-    //               children: <Widget>[
-    //                 Text(service.uuid.toString()),
-    //               ],
-    //             ),
-    //           ),
-    //         ],
-    //       ),
-    //     ),
-    //   );
-    // }
 
     return ListView(
       padding: const EdgeInsets.all(8),

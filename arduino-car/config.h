@@ -11,3 +11,4 @@
 #define photoPin A0
 #define headlightPin 2
 #define hornPin 3
+#define tempPin A1

@@ -94,6 +94,7 @@ void honk()
 BLEService carService("19B10010-E8F2-537E-4F6C-D104768A1214");
 BLEByteCharacteristic headlightCharacteristic("19B10011-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite);
 BLEByteCharacteristic photoCharacteristic("19B10012-E8F2-537E-4F6C-D104768A1214", BLERead | BLENotify);
+BLEByteCharacteristic tempCharacteristic("19B10015-E8F2-537E-4F6C-D104768A1214", BLERead | BLENotify);
 BLEByteCharacteristic hornCharacteristic("19B10013-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite);
 BLEByteCharacteristic motorCharacteristic("19B10014-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite);
 
@@ -117,7 +118,7 @@ void setup()
     // begin initialization
     if (!BLE.begin())
     {
-        Serial.println("starting Bluetooth Low Energy module failed!");
+        Serial.println(F("starting Bluetooth Low Energy module failed!"));
 
         while (1)
             ;
@@ -130,6 +131,7 @@ void setup()
     carService.addCharacteristic(photoCharacteristic);
     carService.addCharacteristic(hornCharacteristic);
     carService.addCharacteristic(motorCharacteristic);
+    carService.addCharacteristic(tempCharacteristic);
 
     BLE.addService(carService);
 
@@ -137,36 +139,51 @@ void setup()
     photoCharacteristic.writeValue(0);
     hornCharacteristic.writeValue(0);
     motorCharacteristic.writeValue(0);
+    tempCharacteristic.writeValue(0);
 
     BLE.advertise();
 
-    Serial.println("Bluetooth device active, waiting for connections...");
+    Serial.println(F("Bluetooth device active, waiting for connections..."));
 }
 
 void loop()
 {
     BLE.poll();
 
-    char photoVal = analogRead(photoPin);
+    int photoVal = analogRead(photoPin);
+
+    float voltage = analogRead(tempPin) * 0.004882813;
+    float degreesC = (voltage - 0.5) * 100.0;
+    float degreesF = degreesC * (9.0 / 5.0) + 32.0;
 
     // has the value changed since the last read
     bool photoChanged = (photoCharacteristic.value() != photoVal);
+    bool tempChanged = (tempCharacteristic.value() != degreesF);
 
     if (photoChanged)
     {
+        Serial.println("Photo changed");
+        Serial.println(photoVal);
         photoCharacteristic.writeValue(photoVal);
+    }
+
+    if (tempChanged)
+    {
+        Serial.println("Temp changed");
+        Serial.println(degreesF);
+        tempCharacteristic.writeValue(degreesF);
     }
 
     if (headlightCharacteristic.written())
     {
         if (headlightCharacteristic.value())
         {
-            Serial.println("LED on");
+            Serial.println(F("LED on"));
             digitalWrite(headlightPin, HIGH);
         }
         else
         {
-            Serial.println("LED off");
+            Serial.println(F("LED off"));
             digitalWrite(headlightPin, LOW);
         }
     }
