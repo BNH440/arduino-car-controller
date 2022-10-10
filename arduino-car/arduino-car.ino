@@ -115,10 +115,9 @@ void setup()
     pinMode(BIN2, OUTPUT);
     pinMode(PWMB, OUTPUT);
 
-    // begin initialization
     if (!BLE.begin())
     {
-        Serial.println(F("starting Bluetooth Low Energy module failed!"));
+        Serial.println(F("Starting BLE module failed"));
 
         while (1)
             ;
@@ -143,7 +142,7 @@ void setup()
 
     BLE.advertise();
 
-    Serial.println(F("Bluetooth device active, waiting for connections..."));
+    Serial.println(F("Bluetooth active, waiting for connections..."));
 }
 
 void loop()
@@ -156,7 +155,6 @@ void loop()
     float degreesC = (voltage - 0.5) * 100.0;
     float degreesF = degreesC * (9.0 / 5.0) + 32.0;
 
-    // has the value changed since the last read
     bool photoChanged = (photoCharacteristic.value() != photoVal);
     bool tempChanged = (tempCharacteristic.value() != degreesF);
 
