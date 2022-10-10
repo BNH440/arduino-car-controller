@@ -120,10 +120,24 @@ class _MyHomePageState extends State<MyHomePage> {
           MaterialButton(
               color: Colors.blue,
               child: const Text(
+                'Reconnect',
+                style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () async {
+                log("Reconnect started");
+                var device = _connectedDevice;
+                await device?.disconnect();
+                await device?.connect();
+                log("Reconnect done");
+              }),
+          MaterialButton(
+              color: Colors.blue,
+              child: const Text(
                 'Horn',
                 style: TextStyle(color: Colors.white),
               ),
               onPressed: () {
+                log("Wrote to characteristic");
                 _services[2].characteristics[2].write([0x00]);
               }),
           MaterialButton(
@@ -133,6 +147,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 style: TextStyle(color: Colors.white),
               ),
               onPressed: () {
+                log("Wrote to characteristic");
                 _services[2].characteristics[0].write([0x01]);
               }),
           MaterialButton(
@@ -142,6 +157,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 style: TextStyle(color: Colors.white),
               ),
               onPressed: () {
+                log("Wrote to characteristic");
                 _services[2].characteristics[0].write([0x00]);
               }),
         ],
@@ -159,6 +175,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     style: TextStyle(color: Colors.white),
                   ),
                   onPressed: () {
+                    log("Wrote to characteristic");
                     _services[2].characteristics[3].write([0x01]);
                   }),
             ],
@@ -171,6 +188,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   style: TextStyle(color: Colors.white),
                 ),
                 onPressed: () {
+                  log("Wrote to characteristic");
                   _services[2].characteristics[3].write([0x03]);
                 }),
             MaterialButton(
@@ -180,6 +198,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   style: TextStyle(color: Colors.white),
                 ),
                 onPressed: () {
+                  log("Wrote to characteristic");
                   _services[2].characteristics[3].write([0x04]);
                 }),
           ]),
@@ -191,6 +210,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   style: TextStyle(color: Colors.white),
                 ),
                 onPressed: () {
+                  log("Wrote to characteristic");
                   _services[2].characteristics[3].write([0x02]);
                 }),
           ]),
@@ -201,6 +221,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 style: TextStyle(color: Colors.white),
               ),
               onPressed: () {
+                log("Wrote to characteristic");
                 _services[2].characteristics[3].write([0x00]);
               }),
           MaterialButton(
@@ -217,7 +238,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     .toString());
               },
               child: Text(
-                  "Light Level: ${(widget.readValues[_services[2].characteristics[1].uuid])?[0]}")),
+                  "Light Level: ${(widget.readValues[_services[2].characteristics[1].uuid])}")),
           MaterialButton(
               onPressed: () async {
                 var sub = _services[2].characteristics[4].value.listen((value) {
@@ -232,7 +253,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     .toString());
               },
               child: Text(
-                  "Temp(F): ${(widget.readValues[_services[2].characteristics[4].uuid])?[0]}")),
+                  "Temp(F): ${(widget.readValues[_services[2].characteristics[4].uuid])}")),
         ],
       )
     ];

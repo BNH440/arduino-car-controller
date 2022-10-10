@@ -70,14 +70,14 @@ void reverse(int speed)
 
 void turnLeft(int speed)
 {
-    spinMotor(left, -speed);
-    spinMotor(right, speed);
+    spinMotor(left, speed);
+    spinMotor(right, -speed);
 }
 
 void turnRight(int speed)
 {
-    spinMotor(left, speed);
-    spinMotor(right, -speed);
+    spinMotor(left, -speed);
+    spinMotor(right, speed);
 }
 
 void stop()
@@ -101,8 +101,8 @@ BLEByteCharacteristic motorCharacteristic("19B10014-E8F2-537E-4F6C-D104768A1214"
 void setup()
 {
     Serial.begin(9600);
-    while (!Serial)
-        ;
+    // while (!Serial)
+    //     ;
 
     pinMode(headlightPin, OUTPUT);
     pinMode(hornPin, OUTPUT);
@@ -120,7 +120,8 @@ void setup()
         Serial.println(F("Starting BLE module failed"));
 
         while (1)
-            ;
+        {
+        };
     }
 
     BLE.setLocalName("RemoteCar");
@@ -190,25 +191,28 @@ void loop()
         honk();
     }
 
-    switch (motorCharacteristic.value())
+    if (motorCharacteristic.written())
     {
-    case 0:
-        stop();
-        break;
-    case 1:
-        forward(255);
-        break;
-    case 2:
-        reverse(255);
-        break;
-    case 3:
-        turnLeft(255);
-        break;
-    case 4:
-        turnRight(255);
-        break;
-    default:
-        stop();
-        break;
+        switch (motorCharacteristic.value())
+        {
+        case 0:
+            stop();
+            break;
+        case 1:
+            forward(255);
+            break;
+        case 2:
+            reverse(255);
+            break;
+        case 3:
+            turnLeft(255);
+            break;
+        case 4:
+            turnRight(255);
+            break;
+        default:
+            stop();
+            break;
+        }
     }
 }
